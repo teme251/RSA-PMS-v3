@@ -1,31 +1,38 @@
-
-/* Light dashboard theme */
+/* Avis Red & White theme */
 *{box-sizing:border-box}
-html,body{margin:0;padding:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:#f7fafc;color:#0f172a}
-header{background:#ffffff;border-bottom:1px solid #e5eff7;position:sticky;top:0;z-index:9}
+html,body{margin:0;padding:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:#fafafa;color:#111827}
+header{background:#ffffff;border-bottom:1px solid #f1f5f9;position:sticky;top:0;z-index:10}
 .header-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:12px;justify-content:space-between;padding:14px 16px}
-.brand{font-weight:800;font-size:16px;color:#0b3a6f}
-.brand .muted{font-weight:500;color:#3b82f6;margin-left:6px}
+.brand{font-weight:800;font-size:16px;color:#b91c1c}
+.brand .muted{font-weight:600;color:#ef4444;margin-left:6px}
 .container{max-width:1200px;margin:0 auto;padding:16px}
-.card{background:#ffffff;border:1px solid #e5eff7;border-radius:14px;padding:14px;margin-bottom:14px;box-shadow:0 1px 2px rgba(2,32,71,.04)}
+.card{background:#ffffff;border:1px solid #f1f5f9;border-radius:14px;padding:14px;margin-bottom:14px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
 .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.tabs{display:flex;gap:8px}
-.tab{background:#fff;border:1px solid #cfe0f5;border-radius:999px;padding:8px 12px;cursor:pointer}
-.tab.active{background:#3b82f6;color:#fff;border-color:#3b82f6}
-.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:12px 0}
-.kpi{background:#ffffff;border:1px solid #e5eff7;border-radius:12px;padding:14px}
-.kpi .label{font-size:12px;color:#33537a}
-.kpi .value{font-size:24px;margin-top:6px}
+input[type="text"],input[type="search"],input[type="number"],select,textarea{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:10px 12px;font-size:14px;color:#111827}
+button{border:1px solid transparent;border-radius:10px;padding:10px 14px;font-size:14px;cursor:pointer}
+button.primary{background:#ef4444;color:#fff}
+button.ghost{background:#fff;border:1px solid #e5e7eb;color:#111827}
+button.primary:hover{filter:brightness(.95)}
+button.ghost:hover{background:#f8fafc}
 .table{width:100%;border-collapse:collapse}
-.table th,.table td{padding:12px 10px;border-bottom:1px solid #edf2f7;text-align:left}
-.table tbody tr:hover{background:#f1f7ff}
-.badge{padding:4px 8px;border-radius:999px;background:#eef6ff;border:1px solid #cfe0f5;color:#0b3a6f;font-size:12px}
-.status{padding:4px 8px;border-radius:999px;border:1px solid #cfe0f5}
-.status.ex{background:#e6fbef;color:#065f46;border-color:#9de6bd}
-.status.tr{background:#eef6ff;color:#0b3a6f}
-.status.nc{background:#fff1f2;color:#9f1239;border-color:#fecdd3}
-footer{color:#33537a;font-size:12px;padding:12px 16px}
-.searchbar{flex:1;min-width:240px}
-.update{color:#33537a}
-.chartcard{padding:16px}
-@media(max-width:760px){.kpis{grid-template-columns:1fr 1fr}}
+.table th,.table td{padding:12px 10px;border-bottom:1px solid #f1f5f9;text-align:left}
+.table tbody tr:hover{background:#fff1f2}
+.badge{padding:4px 8px;border-radius:999px;background:#fff1f2;border:1px solid #fecaca;color:#b91c1c;font-size:12px}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.kpi{background:#fff;border:1px solid #f1f5f9;border-radius:12px;padding:14px}
+.kpi .label{font-size:12px;color:#6b7280}
+.kpi .value{font-size:22px;margin-top:6px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:900px){.kpis{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr}}
+.toast{position:fixed;right:16px;bottom:16px;background:#b91c1c;color:#fff;padding:12px 14px;border-radius:10px;box-shadow:0 8px 20px rgba(185,28,28,.35);opacity:0;transform:translateY(10px);transition:.2s}
+.toast.show{opacity:1;transform:translateY(0)}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:10px}
+/* rating chips 1-10 */
+.rate-chips{display:flex;gap:6px;flex-wrap:wrap}
+.rate-chips input{display:none}
+.rate-chips label{border:1px solid #e5e7eb;background:#fff;color:#111827;border-radius:8px;padding:8px 10px;min-width:34px;text-align:center;cursor:pointer}
+.rate-chips input:checked+label{background:#ef4444;color:#fff;border-color:#ef4444}
+.hr{height:1px;background:#f1f5f9;margin:10px 0}
+.note{color:#6b7280}
+.section-title{margin:6px 0 12px 0}
+.section-sub{margin:6px 0 6px 0;color:#6b7280}
