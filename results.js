@@ -3,45 +3,52 @@ const byId = (id)=>document.getElementById(id);
 let RAW=[];
 let weeklyChart, monthlyChart;
 
-function chipClass(v){ v=Math.max(0,Math.min(10,Math.round(+v))); return "score-c"+v; }
-function avg(a){ return a.length? a.reduce((x,y)=>x+y,0)/a.length : 0; }
+// ----- helpers -----
+const pad=(n)=>String(n).padStart(2,"0");
+function ymdLocal(d){
+  // Return local YYYY-MM-DD for any Date or timestamp string
+  d = (d instanceof Date)? d : new Date(d);
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+}
+function inRangeLocalDate(ts, sYmd, eYmd){
+  const ymd = ymdLocal(ts);
+  return (!sYmd || ymd >= sYmd) && (!eYmd || ymd <= eYmd);
+}
 function startOfDay(d=new Date()){ const x=new Date(d); x.setHours(0,0,0,0); return x; }
 function addDays(d, n){ const x=new Date(d); x.setDate(x.getDate()+n); return x; }
 function daysAgo(n){ return startOfDay(addDays(new Date(), -n)); }
-
 function setRangeToday(){
-  const s = startOfDay();
-  byId("start").value = s.toISOString().slice(0,10);
-  byId("end").value = s.toISOString().slice(0,10);
+  const t = ymdLocal(new Date());
+  byId("start").value = t; byId("end").value = t;
 }
 function setRangeYesterday(){
-  const y = startOfDay(addDays(new Date(), -1));
-  byId("start").value = y.toISOString().slice(0,10);
-  byId("end").value = y.toISOString().slice(0,10);
+  const y = ymdLocal(addDays(new Date(), -1));
+  byId("start").value = y; byId("end").value = y;
 }
 function setRangeLastN(n){
-  const s = daysAgo(n-1);
-  const e = startOfDay();
-  byId("start").value = s.toISOString().slice(0,10);
-  byId("end").value = e.toISOString().slice(0,10);
+  const s = ymdLocal(daysAgo(n-1));
+  const e = ymdLocal(new Date());
+  byId("start").value = s; byId("end").value = e;
 }
+function chipClass(v){ v=Math.max(0,Math.min(10,Math.round(+v))); return "score-c"+v; }
+function avg(a){ return a.length? a.reduce((x,y)=>x+y,0)/a.length : 0; }
 
+// ----- load & events -----
 async function load(){
   try{
     const res = await fetch(API, {cache:"no-store"});
     const json = await res.json();
-    RAW = Array.isArray(json.data)? json.data : [];
+    RAW = Array.isArray(json.data) ? json.data : [];
     byId("updated").textContent = "Last updated " + new Date().toLocaleString();
   }catch(e){ RAW=[]; }
   renderAll();
 }
 document.addEventListener("DOMContentLoaded", ()=>{
-  setRangeToday();
+  if(!byId("start").value || !byId("end").value) setRangeToday();
   load();
 });
 setInterval(load, 5*60*1000);
 
-// Quick range buttons
 document.addEventListener("click",(e)=>{
   const btn = e.target.closest("button[data-range]"); if(!btn) return;
   const r = btn.dataset.range;
@@ -50,18 +57,9 @@ document.addEventListener("click",(e)=>{
   else setRangeLastN(+r);
   renderAll();
 });
+["start","end","search"].forEach(id=> byId(id).addEventListener("input", renderAll));
 
-byId("start").addEventListener("change", renderAll);
-byId("end").addEventListener("change", renderAll);
-byId("search").addEventListener("input", renderAll);
-
-function inRange(ts, sDate, eDate){
-  const t = new Date(ts);
-  const s = startOfDay(new Date(sDate));
-  const e = startOfDay(new Date(eDate));
-  return t >= s && t <= addDays(e, 1); // inclusive end
-}
-
+// ----- table rendering -----
 function groupBy(arr, key){
   const m = new Map();
   arr.forEach(r=>{
@@ -71,15 +69,15 @@ function groupBy(arr, key){
   });
   return m;
 }
-
 function scoreOrZero(x){ const n = +x; return Number.isFinite(n)? n : 0; }
 
 function renderAll(){
-  const s = byId("start").value;
-  const e = byId("end").value;
+  const s = byId("start").value || ymdLocal(new Date());
+  const e = byId("end").value   || ymdLocal(new Date());
   const q = (byId("search").value||"").toLowerCase();
 
-  const rows = RAW.filter(r=> r.name && inRange(r.timestamp, s, e));
+  // Use local-date range filtering (fixes UTC vs local mismatch)
+  const rows = RAW.filter(r => r.name && inRangeLocalDate(r.timestamp, s, e));
   const g = groupBy(rows, "name");
 
   const tb = byId("tbody"); tb.innerHTML="";
@@ -87,41 +85,32 @@ function renderAll(){
 
   g.forEach((listRows, name)=>{
     if(q && !name.toLowerCase().includes(q)) return;
-    // latest timestamp
+
     listRows.sort((a,b)=> new Date(b.timestamp)-new Date(a.timestamp));
     const last = listRows[0];
 
-    // overall average in range
+    // overall average (0–100)
     const overallAvg = avg(listRows.map(r=> scoreOrZero(r.overall)));
 
-    // category averages (1–10 scaled back from overall*weights—you stored raw category 1–10 inside scores_json)
-    // We have r.scores as object; compute per-key avg
+    // category averages (1–10)
     const keys = ["customerInteraction","upsellCompliance","productKnowledge","transparencyEthics","efficiency","teamCollab"];
     const catAvg = Object.fromEntries(keys.map(k=>{
-      const vals = listRows.map(r=> (r.scores && r.scores[k]!=null) ? +r.scores[k] : null).filter(v=> Number.isFinite(v));
+      const vals = listRows
+        .map(r=> (r.scores && r.scores[k]!=null) ? +r.scores[k] : null)
+        .filter(v=> Number.isFinite(v));
       return [k, vals.length? avg(vals) : 0];
     }));
 
-    // checklist completion %
+    // checklist %
     const totalChecks = listRows.reduce((acc,r)=> acc + ((r.checklist||[]).length||0), 0);
     const checksOk   = listRows.reduce((acc,r)=> acc + ((r.checklist||[]).filter(Boolean).length||0), 0);
     const checklistPct = totalChecks? (100*checksOk/totalChecks) : 0;
 
-    // customers
     const customers = listRows.reduce((s,r)=> s + (+r.customersServed||1), 0);
 
-    list.push({
-      name,
-      overall: overallAvg,
-      last: last.timestamp,
-      catAvg,
-      checklistPct,
-      entries: listRows.length,
-      customers
-    });
+    list.push({ name, overall: overallAvg, last: last.timestamp, catAvg, checklistPct, entries: listRows.length, customers });
   });
 
-  // sort by overall desc
   list.sort((a,b)=> b.overall - a.overall);
 
   list.forEach(row=>{
@@ -130,7 +119,7 @@ function renderAll(){
     const cat = row.catAvg;
     tr.innerHTML = `
       <td><a href="detail.html?name=${encodeURIComponent(row.name)}" target="_blank">${row.name}</a></td>
-      <td>${sc(row.overall/10)}<!-- overall normalized to 0–10 scale from 0–100? No, our overall is already 0–100. Show on 0–10 scale: --></td>
+      <td>${sc(row.overall/10)}</td>
       <td>${sc(cat.customerInteraction)}</td>
       <td>${sc(cat.upsellCompliance)}</td>
       <td>${sc(cat.productKnowledge)}</td>
@@ -142,12 +131,6 @@ function renderAll(){
       <td>${row.customers}</td>
       <td>${(row.last||"").slice(0,10)}</td>
     `;
-    // Fix overall scale: convert 0–100 to chipClass 0–10
-    const overallSpan = tr.children[1].querySelector(".score");
-    const overall10 = Math.max(0, Math.min(10, Math.round(row.overall/10)));
-    overallSpan.className = "score "+chipClass(overall10);
-    overallSpan.textContent = (row.overall/10).toFixed(1);
-
     tb.appendChild(tr);
   });
 
@@ -156,14 +139,13 @@ function renderAll(){
   renderWeeklyMonthly();
 }
 
+// ----- weekly/monthly charts (unchanged logic) -----
 function renderWeeklyMonthly(){
-  // Build weekly
+  // Weekly
   const weekly = RAW.filter(r=> new Date(r.timestamp) >= daysAgo(7));
   const mW = groupBy(weekly, "name");
   const tuplesW = [];
-  mW.forEach((rows, name)=>{
-    tuplesW.push({ n: name, v: avg(rows.map(r=> +r.overall||0)) });
-  });
+  mW.forEach((rows, name)=> tuplesW.push({ n: name, v: avg(rows.map(r=> +r.overall||0)) }));
   tuplesW.sort((a,b)=> b.v-a.v);
   const wTop = tuplesW.slice(0,10);
   if(weeklyChart) weeklyChart.destroy();
@@ -176,13 +158,11 @@ function renderWeeklyMonthly(){
     ? `Entries: ${weekly.length} • Overall Avg: ${avg(weekly.map(r=> +r.overall||0)).toFixed(1)}`
     : "No data this week.";
 
-  // Build monthly
+  // Monthly
   const monthly = RAW.filter(r=> new Date(r.timestamp) >= daysAgo(30));
   const mM = groupBy(monthly, "name");
   const tuplesM = [];
-  mM.forEach((rows, name)=>{
-    tuplesM.push({ n: name, v: avg(rows.map(r=> +r.overall||0)) });
-  });
+  mM.forEach((rows, name)=> tuplesM.push({ n: name, v: avg(rows.map(r=> +r.overall||0)) }));
   tuplesM.sort((a,b)=> b.v-a.v);
   const mTop = tuplesM.slice(0,10);
   if(monthlyChart) monthlyChart.destroy();
