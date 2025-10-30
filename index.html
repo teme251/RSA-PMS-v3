@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Avis RSA-PMS — Performance Metrics Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div class="brand">Avis RSA-PMS<span class="muted">— Performance Metrics Dashboard</span></div>
+      <div class="tabs">
+        <button class="tab active" data-scope="weekly">Weekly</button>
+        <button class="tab" data-scope="monthly">Monthly</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="card">
+      <div class="row">
+        <input id="search" class="searchbar" type="search" placeholder="Search associate…">
+        <span class="update" id="updated">Last updated —</span>
+      </div>
+    </div>
+
+    <section class="kpis">
+      <div class="kpi"><div class="label">Associates Rated</div><div class="value" id="kpiA">—</div></div>
+      <div class="kpi"><div class="label">Overall Avg</div><div class="value" id="kpiAvg">—</div></div>
+      <div class="kpi"><div class="label">Top Performer</div><div class="value" id="kpiTop">—</div></div>
+      <div class="kpi"><div class="label">Needs Coaching (&lt;70)</div><div class="value" id="kpiNC">—</div></div>
+    </section>
+
+    <div class="card chartcard">
+      <canvas id="avgChart" height="120"></canvas>
+    </div>
+
+    <div class="card">
+      <table class="table">
+        <thead><tr>
+          <th>Associate</th>
+          <th>Shift</th>
+          <th>Latest Score</th>
+          <th>Status</th>
+          <th>Last Rated</th>
+        </tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+      <p id="empty" class="update" style="margin:8px 0 0">No data yet.</p>
+    </div>
+  </div>
+
+  <footer class="container">Tip: Click any associate to open a shareable detail page. Auto-refreshes every 5 minutes.</footer>
+
+  <script>window.BACKEND_URL = "https://script.google.com/macros/s/AKfycbxdegGrWMt0YlWMic9BURoZPczXgWb4Cx5IiXmEp9hJcUpKwVKpNhHU9khNxTKfRX_-Yw/exec";</script>
+  <script src="results.js"></script>
+</body>
+</html>

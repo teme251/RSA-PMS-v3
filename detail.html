@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RSA Detail — Avis RSA-PMS</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div class="brand">Avis RSA-PMS<span class="muted">— Associate Detail</span></div>
+      <div class="row">
+        <button class="tab" onclick="location.href='index.html'">← Back to Dashboard</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="card">
+      <h2 id="title" style="margin:0">Associate</h2>
+      <p class="update" id="meta">—</p>
+    </div>
+
+    <div class="card chartcard">
+      <canvas id="trendChart" height="130"></canvas>
+    </div>
+
+    <div class="card">
+      <h3 style="margin:0 0 8px 0">Recent Ratings</h3>
+      <table class="table">
+        <thead><tr><th>Date</th><th>Overall</th><th>Shift</th><th>Notes</th></tr></thead>
+        <tbody id="list"></tbody>
+      </table>
+      <p id="empty" class="update" style="margin:8px 0 0">No ratings found for this associate.</p>
+    </div>
+  </div>
+
+  <script>window.BACKEND_URL = "https://script.google.com/macros/s/AKfycbxdegGrWMt0YlWMic9BURoZPczXgWb4Cx5IiXmEp9hJcUpKwVKpNhHU9khNxTKfRX_-Yw/exec";</script>
+  <script src="detail.js"></script>
+</body>
+</html>
