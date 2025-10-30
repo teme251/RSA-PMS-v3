@@ -5,55 +5,72 @@
   <title>Avis RSA-PMS — Performance Metrics Dashboard</title>
   <link rel="stylesheet" href="styles.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script>
+    window.BACKEND_URL = "https://script.google.com/macros/s/AKfycbxdegGrWMt0YlWMic9BURoZPczXgWb4Cx5IiXmEp9hJcUpKwVKpNhHU9khNxTKfRX_-Yw/exec";
+  </script>
 </head>
 <body>
   <header>
     <div class="header-inner">
       <div class="brand">Avis RSA-PMS<span class="muted">— Performance Metrics Dashboard</span></div>
-      <div class="tabs">
-        <button class="tab active" data-scope="weekly">Weekly</button>
-        <button class="tab" data-scope="monthly">Monthly</button>
-      </div>
+      <input id="search" class="searchbar" type="search" placeholder="Search associate…">
     </div>
   </header>
 
   <div class="container">
+    <!-- Today at a glance -->
     <div class="card">
-      <div class="row">
-        <input id="search" class="searchbar" type="search" placeholder="Search associate…">
-        <span class="update" id="updated">Last updated —</span>
+      <h3 style="margin:0 0 10px 0">Today at a glance</h3>
+      <div class="kpis">
+        <div class="kpi"><div class="label">Ratings Today</div><div class="value" id="kpiTodayCount">—</div></div>
+        <div class="kpi"><div class="label">Avg Score Today</div><div class="value" id="kpiTodayAvg">—</div></div>
+        <div class="kpi"><div class="label">Top Performer</div><div class="value" id="kpiTodayTop">—</div></div>
+        <div class="kpi"><div class="label">Customers Served (Today)</div><div class="value" id="kpiTodayCust">—</div></div>
       </div>
     </div>
 
-    <section class="kpis">
-      <div class="kpi"><div class="label">Associates Rated</div><div class="value" id="kpiA">—</div></div>
-      <div class="kpi"><div class="label">Overall Avg</div><div class="value" id="kpiAvg">—</div></div>
-      <div class="kpi"><div class="label">Top Performer</div><div class="value" id="kpiTop">—</div></div>
-      <div class="kpi"><div class="label">Needs Coaching (&lt;70)</div><div class="value" id="kpiNC">—</div></div>
-    </section>
-
-    <div class="card chartcard">
-      <canvas id="avgChart" height="120"></canvas>
+    <!-- Top 3 Best & Worst -->
+    <div class="card">
+      <h3 style="margin:0 0 10px 0">Top 3 — Best & Worst (Today)</h3>
+      <div class="grid2">
+        <div>
+          <h4 class="section-sub">Top 3 Best</h4>
+          <ol id="best3"></ol>
+        </div>
+        <div>
+          <h4 class="section-sub">Top 3 Needs Coaching</h4>
+          <ol id="worst3"></ol>
+        </div>
+      </div>
     </div>
 
+    <!-- Latest table -->
     <div class="card">
       <table class="table">
         <thead><tr>
-          <th>Associate</th>
-          <th>Shift</th>
-          <th>Latest Score</th>
-          <th>Status</th>
-          <th>Last Rated</th>
+          <th>Associate</th><th>Shift</th><th>Latest Score</th><th>Status</th><th>Last Rated</th>
         </tr></thead>
         <tbody id="tbody"></tbody>
       </table>
-      <p id="empty" class="update" style="margin:8px 0 0">No data yet.</p>
+      <p id="empty" class="note" style="margin:8px 0 0">No data yet.</p>
+    </div>
+
+    <!-- Bottom: Weekly & Monthly with chart -->
+    <div class="card">
+      <h3 style="margin:0 0 10px 0">Weekly Averages (Top 10)</h3>
+      <canvas id="weeklyChart" height="110"></canvas>
+      <p class="note" id="weeklyNote" style="margin:8px 0 0">—</p>
+    </div>
+
+    <div class="card">
+      <h3 style="margin:0 0 10px 0">Monthly Averages (Top 10)</h3>
+      <canvas id="monthlyChart" height="110"></canvas>
+      <p class="note" id="monthlyNote" style="margin:8px 0 0">—</p>
     </div>
   </div>
 
-  <footer class="container">Tip: Click any associate to open a shareable detail page. Auto-refreshes every 5 minutes.</footer>
+  <footer class="container"><span id="updated">Last updated —</span></footer>
 
-  <script>window.BACKEND_URL = "https://script.google.com/macros/s/AKfycbxdegGrWMt0YlWMic9BURoZPczXgWb4Cx5IiXmEp9hJcUpKwVKpNhHU9khNxTKfRX_-Yw/exec";</script>
   <script src="results.js"></script>
 </body>
 </html>
