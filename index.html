@@ -4,7 +4,6 @@
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Avis RSA-PMS — Performance Dashboard</title>
   <link rel="stylesheet" href="styles.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script>
     window.BACKEND_URL = "https://script.google.com/macros/s/AKfycbxdegGrWMt0YlWMic9BURoZPczXgWb4Cx5IiXmEp9hJcUpKwVKpNhHU9khNxTKfRX_-Yw/exec";
   </script>
@@ -17,8 +16,7 @@
     .score-c8{background:#9ddd3f} .score-c9{background:#6ede56}
     .score-c10{background:#22c55e}
     .small{font-size:12px;color:#6b7280}
-    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    @media(max-width:900px){.grid2{grid-template-columns:1fr}}
+    .legend ul{margin:6px 0 0 18px}
   </style>
 </head>
 <body>
@@ -45,8 +43,24 @@
       </div>
     </div>
 
-    <!-- Table with full details (overall + categories + checklist%) -->
+    <!-- Checklist reference -->
+    <div class="card legend">
+      <h3 style="margin:0 0 8px 0">Policy & Customer-First Checklist (reference)</h3>
+      <p class="small" style="margin:0">Completion % is shown per RSA in the tables below.</p>
+      <ul>
+        <li>Greeted customer within 10 seconds</li>
+        <li>Verified ID &amp; payment clearly</li>
+        <li>Explained insurance options neutrally</li>
+        <li>Explained fuel/EV policy accurately</li>
+        <li>Offered upgrade only if beneficial</li>
+        <li>Reviewed total cost before payment</li>
+        <li>Closed courteously &amp; asked for questions</li>
+      </ul>
+    </div>
+
+    <!-- Main table for selected range -->
     <div class="card">
+      <h3 style="margin:0 0 10px 0">Selected Range</h3>
       <table class="table">
         <thead>
           <tr>
@@ -59,7 +73,6 @@
             <th>EF</th>
             <th>TC</th>
             <th>Checklist %</th>
-            <th>Entries</th>
             <th>Customers</th>
             <th>Last Rated</th>
           </tr>
@@ -69,18 +82,52 @@
       <p id="empty" class="note" style="margin:8px 0 0">No data for selected range.</p>
     </div>
 
-    <!-- Weekly & Monthly summaries with charts -->
-    <div class="grid2">
-      <div class="card">
-        <h3 style="margin:0 0 10px 0">Weekly — Top 10 Avg Overall</h3>
-        <canvas id="weeklyChart" height="110"></canvas>
-        <p class="note" id="weeklyNote" style="margin:8px 0 0">—</p>
-      </div>
-      <div class="card">
-        <h3 style="margin:0 0 10px 0">Monthly — Top 10 Avg Overall</h3>
-        <canvas id="monthlyChart" height="110"></canvas>
-        <p class="note" id="monthlyNote" style="margin:8px 0 0">—</p>
-      </div>
+    <!-- Weekly ALL RSAs -->
+    <div class="card">
+      <h3 style="margin:0 0 10px 0">Weekly — ALL RSAs</h3>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Associate</th>
+            <th>Overall</th>
+            <th>CI</th>
+            <th>UC</th>
+            <th>PK</th>
+            <th>TE</th>
+            <th>EF</th>
+            <th>TC</th>
+            <th>Checklist %</th>
+            <th>Customers</th>
+            <th>Last Rated</th>
+          </tr>
+        </thead>
+        <tbody id="weeklyBody"></tbody>
+      </table>
+      <p class="note" id="weeklyNote" style="margin:8px 0 0">—</p>
+    </div>
+
+    <!-- Monthly ALL RSAs -->
+    <div class="card">
+      <h3 style="margin:0 0 10px 0">Monthly — ALL RSAs</h3>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Associate</th>
+            <th>Overall</th>
+            <th>CI</th>
+            <th>UC</th>
+            <th>PK</th>
+            <th>TE</th>
+            <th>EF</th>
+            <th>TC</th>
+            <th>Checklist %</th>
+            <th>Customers</th>
+            <th>Last Rated</th>
+          </tr>
+        </thead>
+        <tbody id="monthlyBody"></tbody>
+      </table>
+      <p class="note" id="monthlyNote" style="margin:8px 0 0">—</p>
     </div>
   </div>
 
