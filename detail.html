@@ -5,13 +5,25 @@
   <title>RSA Detail — Avis RSA-PMS</title>
   <link rel="stylesheet" href="styles.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    .score{display:inline-block;padding:4px 8px;border-radius:8px;color:#fff;font-weight:600}
+    .score-c0{background:#ef4444} .score-c1{background:#f2553d}
+    .score-c2{background:#f56636} .score-c3{background:#f8772f}
+    .score-c4{background:#fb8828} .score-c5{background:#fda821}
+    .score-c6{background:#e7c91f} .score-c7{background:#c5da2a}
+    .score-c8{background:#9ddd3f} .score-c9{background:#6ede56}
+    .score-c10{background:#22c55e}
+    .small{font-size:12px;color:#6b7280}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    @media(max-width:900px){.grid2{grid-template-columns:1fr}}
+  </style>
 </head>
 <body>
   <header>
     <div class="header-inner">
       <div class="brand">Avis RSA-PMS<span class="muted">— Associate Detail</span></div>
       <div class="row">
-        <button class="tab" onclick="location.href='index.html'">← Back to Dashboard</button>
+        <button class="ghost" onclick="location.href='index.html'">← Back to Dashboard</button>
       </div>
     </div>
   </header>
@@ -19,20 +31,52 @@
   <div class="container">
     <div class="card">
       <h2 id="title" style="margin:0">Associate</h2>
-      <p class="update" id="meta">—</p>
+      <div class="row">
+        <label>Start <input id="start" type="date"></label>
+        <label>End <input id="end" type="date"></label>
+        <button class="ghost" data-range="today">Today</button>
+        <button class="ghost" data-range="yesterday">Yesterday</button>
+        <button class="ghost" data-range="7">Last 7</button>
+        <button class="ghost" data-range="30">Last 30</button>
+        <span class="small" id="meta">—</span>
+      </div>
     </div>
 
-    <div class="card chartcard">
-      <canvas id="trendChart" height="130"></canvas>
+    <div class="grid2">
+      <div class="card">
+        <h3 style="margin:0 0 8px 0">Category Averages</h3>
+        <table class="table">
+          <thead><tr><th>Category</th><th>Avg (1–10)</th></tr></thead>
+          <tbody id="cats"></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h3 style="margin:0 0 8px 0">Checklist Completion</h3>
+        <table class="table">
+          <thead><tr><th>Item</th><th>% Completed</th></tr></thead>
+          <tbody id="checks"></tbody>
+        </table>
+      </div>
     </div>
 
     <div class="card">
-      <h3 style="margin:0 0 8px 0">Recent Ratings</h3>
+      <h3 style="margin:0 0 8px 0">Overall Trend</h3>
+      <canvas id="trendChart" height="120"></canvas>
+    </div>
+
+    <div class="card">
+      <h3 style="margin:0 0 8px 0">Recent Ratings (full breakdown)</h3>
       <table class="table">
-        <thead><tr><th>Date</th><th>Overall</th><th>Shift</th><th>Notes</th></tr></thead>
+        <thead>
+          <tr>
+            <th>Date</th><th>Overall</th>
+            <th>CI</th><th>UC</th><th>PK</th><th>TE</th><th>EF</th><th>TC</th>
+            <th>Checklist</th><th>Customers</th><th>Notes</th>
+          </tr>
+        </thead>
         <tbody id="list"></tbody>
       </table>
-      <p id="empty" class="update" style="margin:8px 0 0">No ratings found for this associate.</p>
+      <p id="empty" class="note" style="margin:8px 0 0">No ratings in this range.</p>
     </div>
   </div>
 
