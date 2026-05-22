@@ -1,36 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RSA Detail — Avis RSA-PMS</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RSA Performance Metrics System — Associate Detail</title>
+  <meta name="description" content="Personal prototype: associate performance detail with AI coaching. No confidential company data is used.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <style>
-    .score{display:inline-block;padding:4px 8px;border-radius:8px;color:#fff;font-weight:600}
-    .score-c0{background:#ef4444} .score-c1{background:#f2553d}
-    .score-c2{background:#f56636} .score-c3{background:#f8772f}
-    .score-c4{background:#fb8828} .score-c5{background:#fda821}
-    .score-c6{background:#e7c91f} .score-c7{background:#c5da2a}
-    .score-c8{background:#9ddd3f} .score-c9{background:#6ede56}
-    .score-c10{background:#22c55e}
-    .small{font-size:12px;color:#6b7280}
-    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    @media(max-width:900px){.grid2{grid-template-columns:1fr}}
-  </style>
+  <script>
+    window.BACKEND_URL = "https://script.google.com/macros/s/AKfycbxdegGrWMt0YlWMic9BURoZPczXgWb4Cx5IiXmEp9hJcUpKwVKpNhHU9khNxTKfRX_-Yw/exec";
+  </script>
 </head>
 <body>
-  <header>
+
+  <div class="disclaimer-strip">
+    Personal prototype for demonstration purposes. No confidential company data is used.
+  </div>
+
+  <header class="site-header">
     <div class="header-inner">
-      <div class="brand">Avis RSA-PMS<span class="muted">— Associate Detail</span></div>
-      <div class="row">
-        <button class="ghost" onclick="location.href='index.html'">← Back to Dashboard</button>
+      <div class="brand">
+        <span class="logo" aria-hidden="true">
+          <svg viewBox="0 0 32 32" width="32" height="32">
+            <rect x="5" y="16" width="5" height="11" rx="1.5"></rect>
+            <rect x="13.5" y="10" width="5" height="17" rx="1.5"></rect>
+            <rect x="22" y="5" width="5" height="22" rx="1.5"></rect>
+          </svg>
+        </span>
+        <div class="brand-text">
+          <h1>RSA Performance Metrics System</h1>
+          <p class="subtitle">Associate Detail</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="ghost" onclick="location.href='index.html'">&larr; Back to Dashboard</button>
       </div>
     </div>
   </header>
 
   <div class="container">
     <div class="card">
-      <h2 id="title" style="margin:0">Associate</h2>
+      <h2 id="title" style="margin:0 0 8px 0">Associate</h2>
       <div class="row">
         <label>Start <input id="start" type="date"></label>
         <label>End <input id="end" type="date"></label>
@@ -38,9 +51,12 @@
         <button class="ghost" data-range="yesterday">Yesterday</button>
         <button class="ghost" data-range="7">Last 7</button>
         <button class="ghost" data-range="30">Last 30</button>
-        <span class="small" id="meta">—</span>
+        <span class="note" id="meta">—</span>
       </div>
     </div>
+
+    <!-- AI Coaching Summary -->
+    <section id="coachCard"></section>
 
     <div class="grid2">
       <div class="card">
@@ -66,21 +82,265 @@
 
     <div class="card">
       <h3 style="margin:0 0 8px 0">Recent Ratings (full breakdown)</h3>
-      <table class="table">
-        <thead>
-          <tr>
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr>
             <th>Date</th><th>Overall</th>
             <th>CI</th><th>UC</th><th>PK</th><th>TE</th><th>EF</th><th>TC</th>
             <th>Checklist</th><th>Customers</th><th>Notes</th>
-          </tr>
-        </thead>
-        <tbody id="list"></tbody>
-      </table>
+          </tr></thead>
+          <tbody id="list"></tbody>
+        </table>
+      </div>
       <p id="empty" class="note" style="margin:8px 0 0">No ratings in this range.</p>
     </div>
   </div>
 
-  <script>window.BACKEND_URL = "https://script.google.com/macros/s/AKfycbxdegGrWMt0YlWMic9BURoZPczXgWb4Cx5IiXmEp9hJcUpKwVKpNhHU9khNxTKfRX_-Yw/exec";</script>
-  <script src="detail.js"></script>
+  <footer class="site-footer">
+    <p><strong>RSA Performance Metrics System</strong> — a personal prototype for AI-enabled operations performance coaching.</p>
+    <p class="fine">Inspired by frontline rental car operations. Not an official product of, and not affiliated with, any company.</p>
+  </footer>
+
+  <script>
+  /* ===== AI COACHING ENGINE — rules-based, no API key ===== */
+  var CoachingEngine = (function(){
+    var CATS = [
+      {key:"customerInteraction",label:"Customer Interaction"},
+      {key:"upsellCompliance",label:"Upselling Compliance"},
+      {key:"productKnowledge",label:"Product Knowledge"},
+      {key:"transparencyEthics",label:"Transparency & Ethics"},
+      {key:"efficiency",label:"Efficiency"},
+      {key:"teamCollab",label:"Team Collaboration"}
+    ];
+    var BELOW=7, STRONG=8;
+    var OPP={
+      transparencyEthics:"Coaching on pricing clarity and accurate policy explanation (Transparency & Ethics)",
+      efficiency:"Coaching on process speed and workflow efficiency (Efficiency)",
+      upsellCompliance:"Coaching on customer-focused, needs-based upgrade offers (Upselling Compliance)",
+      customerInteraction:"Coaching on customer engagement, greeting standards, and rapport (Customer Interaction)",
+      productKnowledge:"Coaching on product knowledge and accurate policy detail (Product Knowledge)",
+      teamCollab:"Coaching on teamwork, collaboration, and shift support (Team Collaboration)"
+    };
+    function forScores(scores,name){
+      name = name || "This associate";
+      var sc = CATS.map(function(c){return {key:c.key,label:c.label,value:+scores[c.key]||0};});
+      var have = sc.filter(function(s){return s.value>0;});
+      var below = have.filter(function(s){return s.value<BELOW;});
+      var strengths = have.filter(function(s){return s.value>STRONG;})
+        .map(function(s){return "Strong "+s.label+" ("+s.value.toFixed(1)+")";});
+      if(!strengths.length) strengths.push("Maintains consistent baseline performance across categories");
+      var opps=[];
+      ["transparencyEthics","efficiency","upsellCompliance","customerInteraction","productKnowledge","teamCollab"]
+        .forEach(function(k){ var v=+scores[k]||0; if(v>0 && v<BELOW) opps.push(OPP[k]); });
+      if(!opps.length) opps.push("No critical coaching gaps — focus on sustaining current standards");
+      var risk = below.length>=2 ? "High" : below.length===1 ? "Medium" : "Low";
+      var action = {
+        High:"Schedule a structured 1:1 coaching session within 5 business days and arrange a shadow shift with a top performer.",
+        Medium:"Hold a brief, targeted check-in this week on the flagged category, then reassess at the next rating cycle.",
+        Low:"Recognise performance and assign a stretch goal or peer-mentoring responsibility."
+      }[risk];
+      var low = have.length ? have.reduce(function(a,b){return b.value<a.value?b:a;}) : {label:"the lowest category"};
+      var note = risk==="High"
+        ? name+" has clear, addressable gaps; with focused support on "+low.label+", performance can improve quickly within one cycle."
+        : risk==="Medium"
+        ? name+" is performing solidly overall; a short, specific conversation on "+low.label+" should close the remaining gap."
+        : name+" is a dependable, consistent performer; consider stretch responsibilities and a peer-mentoring role.";
+      return {strengths:strengths,opportunities:opps,risk:risk,managerAction:action,note:note};
+    }
+    function cardHTML(o,title,meta){
+      return '<div class="coach-card">'+
+        '<div class="coach-head"><div><h3>'+title+'</h3>'+
+          (meta?'<p class="coach-meta">'+meta+'</p>':'')+'</div>'+
+          '<span class="ai-tag">AI \u00b7 rules-based</span></div>'+
+        '<div class="coach-grid">'+
+          '<div class="coach-block"><h4>Strengths</h4><ul class="list list--good">'+
+            o.strengths.map(function(s){return "<li>"+s+"</li>";}).join("")+'</ul></div>'+
+          '<div class="coach-block"><h4>Coaching Opportunities</h4><ul class="list list--watch">'+
+            o.opportunities.map(function(x){return "<li>"+x+"</li>";}).join("")+'</ul></div>'+
+        '</div>'+
+        '<div class="coach-row">'+
+          '<div class="coach-risk"><span class="coach-risk-label">Risk Level</span>'+
+            '<span class="risk risk--'+o.risk.toLowerCase()+' risk--lg">'+o.risk+'</span></div>'+
+          '<div class="coach-action"><span class="coach-risk-label">Suggested Manager Action</span>'+
+            '<p>'+o.managerAction+'</p></div>'+
+        '</div>'+
+        '<blockquote class="coach-note"><span class="quote-mark">\u201c</span>'+o.note+'</blockquote>'+
+        '<p class="coach-foot">Generated locally by a rules-based engine for demonstration. '+
+        'A future release can route this through a secure backend for OpenAI / Azure OpenAI '+
+        'summaries — no API key is ever stored in the browser.</p></div>';
+    }
+    return {CATS:CATS,forScores:forScores,cardHTML:cardHTML};
+  })();
+
+  /* ===== Associate Detail logic (your detail.js + AI coaching) ===== */
+  const API = window.BACKEND_URL;
+  const byId = (id)=>document.getElementById(id);
+  let RAW=[], NAME="";
+  let chart;
+
+  function chipClass(v){ v=Math.max(0,Math.min(10,Math.round(+v))); return "score-c"+v; }
+  function avg(a){ return a.length? a.reduce((x,y)=>x+y,0)/a.length : 0; }
+  function startOfDay(d=new Date()){ const x=new Date(d); x.setHours(0,0,0,0); return x; }
+  function addDays(d,n){ const x=new Date(d); x.setDate(x.getDate()+n); return x; }
+  function daysAgo(n){ return startOfDay(addDays(new Date(), -n)); }
+  function qs(key){ return new URL(location.href).searchParams.get(key); }
+
+  function setRangeToday(){
+    const s=startOfDay(); byId("start").value=s.toISOString().slice(0,10); byId("end").value=s.toISOString().slice(0,10);
+  }
+  function setRangeYesterday(){
+    const y=startOfDay(addDays(new Date(),-1)); byId("start").value=y.toISOString().slice(0,10); byId("end").value=y.toISOString().slice(0,10);
+  }
+  function setRangeLastN(n){
+    const s=daysAgo(n-1), e=startOfDay();
+    byId("start").value=s.toISOString().slice(0,10); byId("end").value=e.toISOString().slice(0,10);
+  }
+  function inRange(ts,sDate,eDate){
+    const t=new Date(ts), s=startOfDay(new Date(sDate)), e=startOfDay(new Date(eDate));
+    return t>=s && t<=addDays(e,1);
+  }
+
+  async function load(){
+    NAME = (qs("name")||"").trim();
+    if(!NAME){ byId("title").textContent="No associate selected"; return; }
+    byId("title").textContent = NAME;
+    try{
+      const res = await fetch(API, {cache:"no-store"});
+      const json = await res.json();
+      RAW = (json.data||[]).filter(r=> (r.name||"").toLowerCase()===NAME.toLowerCase());
+    }catch(e){ RAW=[]; }
+    setRangeLastN(7);
+    render();
+  }
+  document.addEventListener("DOMContentLoaded", load);
+
+  document.addEventListener("click",(e)=>{
+    const btn = e.target.closest("button[data-range]"); if(!btn) return;
+    const r = btn.dataset.range;
+    if(r==="today") setRangeToday();
+    else if(r==="yesterday") setRangeYesterday();
+    else setRangeLastN(+r);
+    render();
+  });
+  byId("start").addEventListener("change", render);
+  byId("end").addEventListener("change", render);
+
+  function render(){
+    const s=byId("start").value, e=byId("end").value;
+    const rows = RAW.filter(r=> inRange(r.timestamp, s, e))
+                    .sort((a,b)=> new Date(b.timestamp)-new Date(a.timestamp));
+
+    byId("meta").textContent = rows.length
+      ? `Entries: ${rows.length} • Last rated ${(rows[0].timestamp||"").slice(0,10)}`
+      : "No entries in this range.";
+
+    const keys = [
+      ["customerInteraction","CI"],
+      ["upsellCompliance","UC"],
+      ["productKnowledge","PK"],
+      ["transparencyEthics","TE"],
+      ["efficiency","EF"],
+      ["teamCollab","TC"]
+    ];
+    const catAvg = Object.fromEntries(keys.map(([k])=>{
+      const vals = rows.map(r=> (r.scores&&r.scores[k]!=null)? +r.scores[k] : null)
+                       .filter(v=> Number.isFinite(v));
+      return [k, vals.length? avg(vals) : 0];
+    }));
+    const catTb = byId("cats"); catTb.innerHTML="";
+    keys.forEach(([k,label])=>{
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${label}</td><td><span class="score ${chipClass(catAvg[k])}">${catAvg[k].toFixed(1)}</span></td>`;
+      catTb.appendChild(tr);
+    });
+
+    /* AI Coaching Summary for this associate */
+    renderCoach(catAvg, NAME, rows.length);
+
+    const items = [
+      "Greeted customer within 10 seconds",
+      "Verified ID & payment clearly",
+      "Explained insurance options neutrally",
+      "Explained fuel/EV policy accurately",
+      "Offered upgrade only if beneficial",
+      "Reviewed total cost before payment",
+      "Closed courteously & asked for questions"
+    ];
+    const checksTb = byId("checks"); checksTb.innerHTML="";
+    items.forEach((label,i)=>{
+      const total = rows.reduce((a,r)=> a + ((r.checklist||[]).length>i ? 1 : 0), 0);
+      const ok = rows.reduce((a,r)=> a + ((r.checklist||[])[i] ? 1 : 0), 0);
+      const pct = total? (100*ok/total) : 0;
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${label}</td><td>${pct.toFixed(0)}%</td>`;
+      checksTb.appendChild(tr);
+    });
+
+    const labels = rows.slice(0,30).map(r=> (r.timestamp||"").slice(5,10)).reverse();
+    const data = rows.slice(0,30).map(r=> +r.overall||0).reverse();
+    drawTrend(labels, data);
+
+    const tb = byId("list"); tb.innerHTML="";
+    rows.slice(0,20).forEach(r=>{
+      const sc = r.scores||{};
+      const ov = +r.overall||0;
+      const checklist = (r.checklist||[]).filter(Boolean).length + "/" + (r.checklist||[]).length;
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${(r.timestamp||"").slice(0,10)}</td>
+        <td><span class="score ${chipClass(ov/10)}">${ov.toFixed(0)}</span></td>
+        <td><span class="score ${chipClass(+sc.customerInteraction||0)}">${(+sc.customerInteraction||0).toFixed(1)}</span></td>
+        <td><span class="score ${chipClass(+sc.upsellCompliance||0)}">${(+sc.upsellCompliance||0).toFixed(1)}</span></td>
+        <td><span class="score ${chipClass(+sc.productKnowledge||0)}">${(+sc.productKnowledge||0).toFixed(1)}</span></td>
+        <td><span class="score ${chipClass(+sc.transparencyEthics||0)}">${(+sc.transparencyEthics||0).toFixed(1)}</span></td>
+        <td><span class="score ${chipClass(+sc.efficiency||0)}">${(+sc.efficiency||0).toFixed(1)}</span></td>
+        <td><span class="score ${chipClass(+sc.teamCollab||0)}">${(+sc.teamCollab||0).toFixed(1)}</span></td>
+        <td>${checklist}</td>
+        <td>${(+r.customersServed||1)}</td>
+        <td>${(r.notes||"")}</td>`;
+      tb.appendChild(tr);
+    });
+    byId("empty").style.display = rows.length? "none":"block";
+  }
+
+  function renderCoach(catAvg, name, count){
+    const el = byId("coachCard");
+    if(!count){
+      el.innerHTML='<div class="card"><p class="note" style="margin:0">No ratings in this range — adjust the date range to generate an AI Coaching Summary.</p></div>';
+      return;
+    }
+    const c = CoachingEngine.forScores(catAvg, name);
+    el.innerHTML = CoachingEngine.cardHTML(c, "AI Coaching Summary — "+name,
+      count+" rating"+(count>1?"s":"")+" in selected range");
+  }
+
+  function drawTrend(labels, data){
+    if(chart) chart.destroy();
+    const ctx = document.getElementById("trendChart").getContext("2d");
+    const grad = ctx.createLinearGradient(0,0,0,260);
+    grad.addColorStop(0,"rgba(47,224,196,.28)");
+    grad.addColorStop(1,"rgba(47,224,196,0)");
+    chart = new Chart(ctx, {
+      type: "line",
+      data: { labels, datasets: [{
+        label:"Overall (0–100)", data, tension:.35, fill:true,
+        borderColor:"#2fe0c4", backgroundColor:grad, borderWidth:2,
+        pointBackgroundColor:"#2fe0c4", pointBorderColor:"#0b0d13", pointBorderWidth:2,
+        pointRadius:3, pointHoverRadius:5
+      }] },
+      options: {
+        responsive:true,
+        plugins:{ legend:{ display:false } },
+        scales:{
+          y:{ beginAtZero:true, max:100,
+              ticks:{ color:"#6f7589" }, grid:{ color:"rgba(255,255,255,.055)" },
+              border:{ color:"rgba(255,255,255,.09)" } },
+          x:{ ticks:{ color:"#6f7589" }, grid:{ color:"rgba(255,255,255,.03)" },
+              border:{ color:"rgba(255,255,255,.09)" } }
+        }
+      }
+    });
+  }
+  </script>
 </body>
 </html>

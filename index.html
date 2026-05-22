@@ -1,36 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Avis RSA-PMS — Performance Dashboard</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RSA Performance Metrics System — AI-Ready Operations Dashboard</title>
+  <meta name="description" content="Personal prototype demonstrating AI-enabled operations performance coaching. No confidential company data is used.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <script>
+    /* Google Apps Script backend (unchanged from your system) */
     window.BACKEND_URL = "https://script.google.com/macros/s/AKfycbxdegGrWMt0YlWMic9BURoZPczXgWb4Cx5IiXmEp9hJcUpKwVKpNhHU9khNxTKfRX_-Yw/exec";
   </script>
-  <style>
-    .score{display:inline-block;padding:4px 8px;border-radius:8px;color:#fff;font-weight:600}
-    .score-c0{background:#ef4444} .score-c1{background:#f2553d}
-    .score-c2{background:#f56636} .score-c3{background:#f8772f}
-    .score-c4{background:#fb8828} .score-c5{background:#fda821}
-    .score-c6{background:#e7c91f} .score-c7{background:#c5da2a}
-    .score-c8{background:#9ddd3f} .score-c9{background:#6ede56}
-    .score-c10{background:#22c55e}
-    .small{font-size:12px;color:#6b7280}
-    .legend ul{margin:6px 0 0 18px}
-  </style>
 </head>
 <body>
-  <header>
+
+  <div class="disclaimer-strip">
+    Personal prototype for demonstration purposes. No confidential company data is used.
+  </div>
+
+  <header class="site-header">
     <div class="header-inner">
-      <div class="brand">Avis RSA-PMS<span class="muted">— Performance Dashboard</span></div>
-      <div class="row">
-        <input id="search" class="searchbar" type="search" placeholder="Search associate…">
+      <div class="brand">
+        <span class="logo" aria-hidden="true">
+          <svg viewBox="0 0 32 32" width="32" height="32">
+            <rect x="5" y="16" width="5" height="11" rx="1.5"></rect>
+            <rect x="13.5" y="10" width="5" height="17" rx="1.5"></rect>
+            <rect x="22" y="5" width="5" height="22" rx="1.5"></rect>
+          </svg>
+        </span>
+        <div class="brand-text">
+          <h1>RSA Performance Metrics System</h1>
+          <p class="subtitle">AI-Ready Frontline Operations Dashboard</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <input id="search" type="search" placeholder="Search associate…">
       </div>
     </div>
   </header>
 
   <div class="container">
-    <!-- Date range controls -->
+
+    <!-- Date range -->
     <div class="card">
       <div class="row">
         <label>Start <input id="start" type="date"></label>
@@ -39,14 +52,68 @@
         <button class="ghost" data-range="yesterday">Yesterday</button>
         <button class="ghost" data-range="7">Last 7</button>
         <button class="ghost" data-range="30">Last 30</button>
-        <span class="small" id="updated">Last updated —</span>
+        <span class="note" id="updated">Last updated —</span>
       </div>
+    </div>
+
+    <!-- KPI cards -->
+    <section class="kpis" id="kpis" aria-label="Summary metrics"></section>
+
+    <!-- Team AI Coaching Summary -->
+    <section id="teamCoach"></section>
+
+    <!-- Selected Range -->
+    <div class="card">
+      <h3 style="margin:0 0 10px 0">Selected Range</h3>
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr>
+            <th>Associate</th><th>Overall</th><th>Status</th>
+            <th>CI</th><th>UC</th><th>PK</th><th>TE</th><th>EF</th><th>TC</th>
+            <th>Checklist %</th><th>Customers</th><th>Last Rated</th>
+          </tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+      <p id="empty" class="note" style="margin:8px 0 0">No data for selected range.</p>
+    </div>
+
+    <!-- Weekly -->
+    <div class="card">
+      <h3 style="margin:0 0 10px 0">Weekly — All RSAs</h3>
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr>
+            <th>Associate</th><th>Overall</th><th>Status</th>
+            <th>CI</th><th>UC</th><th>PK</th><th>TE</th><th>EF</th><th>TC</th>
+            <th>Checklist %</th><th>Customers</th><th>Last Rated</th>
+          </tr></thead>
+          <tbody id="weeklyBody"></tbody>
+        </table>
+      </div>
+      <p class="note" id="weeklyNote" style="margin:8px 0 0">—</p>
+    </div>
+
+    <!-- Monthly -->
+    <div class="card">
+      <h3 style="margin:0 0 10px 0">Monthly — All RSAs</h3>
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr>
+            <th>Associate</th><th>Overall</th><th>Status</th>
+            <th>CI</th><th>UC</th><th>PK</th><th>TE</th><th>EF</th><th>TC</th>
+            <th>Checklist %</th><th>Customers</th><th>Last Rated</th>
+          </tr></thead>
+          <tbody id="monthlyBody"></tbody>
+        </table>
+      </div>
+      <p class="note" id="monthlyNote" style="margin:8px 0 0">—</p>
     </div>
 
     <!-- Checklist reference -->
     <div class="card legend">
-      <h3 style="margin:0 0 8px 0">Policy & Customer-First Checklist (reference)</h3>
-      <p class="small" style="margin:0">Completion % is shown per RSA in the tables below.</p>
+      <h3 style="margin:0 0 6px 0">Policy &amp; Customer-First Checklist (reference)</h3>
+      <p class="note" style="margin:0">Completion % is shown per RSA in the tables above.</p>
       <ul>
         <li>Greeted customer within 10 seconds</li>
         <li>Verified ID &amp; payment clearly</li>
@@ -58,79 +125,277 @@
       </ul>
     </div>
 
-    <!-- Main table for selected range -->
-    <div class="card">
-      <h3 style="margin:0 0 10px 0">Selected Range</h3>
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Associate</th>
-            <th>Overall</th>
-            <th>CI</th>
-            <th>UC</th>
-            <th>PK</th>
-            <th>TE</th>
-            <th>EF</th>
-            <th>TC</th>
-            <th>Checklist %</th>
-            <th>Customers</th>
-            <th>Last Rated</th>
-          </tr>
-        </thead>
-        <tbody id="tbody"></tbody>
-      </table>
-      <p id="empty" class="note" style="margin:8px 0 0">No data for selected range.</p>
-    </div>
-
-    <!-- Weekly ALL RSAs -->
-    <div class="card">
-      <h3 style="margin:0 0 10px 0">Weekly — ALL RSAs</h3>
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Associate</th>
-            <th>Overall</th>
-            <th>CI</th>
-            <th>UC</th>
-            <th>PK</th>
-            <th>TE</th>
-            <th>EF</th>
-            <th>TC</th>
-            <th>Checklist %</th>
-            <th>Customers</th>
-            <th>Last Rated</th>
-          </tr>
-        </thead>
-        <tbody id="weeklyBody"></tbody>
-      </table>
-      <p class="note" id="weeklyNote" style="margin:8px 0 0">—</p>
-    </div>
-
-    <!-- Monthly ALL RSAs -->
-    <div class="card">
-      <h3 style="margin:0 0 10px 0">Monthly — ALL RSAs</h3>
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Associate</th>
-            <th>Overall</th>
-            <th>CI</th>
-            <th>UC</th>
-            <th>PK</th>
-            <th>TE</th>
-            <th>EF</th>
-            <th>TC</th>
-            <th>Checklist %</th>
-            <th>Customers</th>
-            <th>Last Rated</th>
-          </tr>
-        </thead>
-        <tbody id="monthlyBody"></tbody>
-      </table>
-      <p class="note" id="monthlyNote" style="margin:8px 0 0">—</p>
-    </div>
   </div>
 
-  <script src="results.js"></script>
+  <footer class="site-footer">
+    <p><strong>RSA Performance Metrics System</strong> — a personal prototype for AI-enabled operations performance coaching.</p>
+    <p class="fine">Inspired by frontline rental car operations. Not an official product of, and not affiliated with, any company. No confidential company data is used.</p>
+  </footer>
+
+  <script>
+  /* =============================================================
+     AI COACHING ENGINE — rules-based, no API key.
+     Phase 3 upgrade: route through a secure serverless function
+     holding the OpenAI/Azure key in an environment variable.
+     Never place a key in this file — it is public.
+     ============================================================= */
+  var CoachingEngine = (function(){
+    var CATS = [
+      {key:"customerInteraction",label:"Customer Interaction"},
+      {key:"upsellCompliance",label:"Upselling Compliance"},
+      {key:"productKnowledge",label:"Product Knowledge"},
+      {key:"transparencyEthics",label:"Transparency & Ethics"},
+      {key:"efficiency",label:"Efficiency"},
+      {key:"teamCollab",label:"Team Collaboration"}
+    ];
+    var BELOW=7, STRONG=8;
+    var OPP={
+      transparencyEthics:"Coaching on pricing clarity and accurate policy explanation (Transparency & Ethics)",
+      efficiency:"Coaching on process speed and workflow efficiency (Efficiency)",
+      upsellCompliance:"Coaching on customer-focused, needs-based upgrade offers (Upselling Compliance)",
+      customerInteraction:"Coaching on customer engagement, greeting standards, and rapport (Customer Interaction)",
+      productKnowledge:"Coaching on product knowledge and accurate policy detail (Product Knowledge)",
+      teamCollab:"Coaching on teamwork, collaboration, and shift support (Team Collaboration)"
+    };
+    function forScores(scores,name){
+      name = name || "This associate";
+      var sc = CATS.map(function(c){return {key:c.key,label:c.label,value:+scores[c.key]||0};});
+      var have = sc.filter(function(s){return s.value>0;});
+      var below = have.filter(function(s){return s.value<BELOW;});
+      var strengths = have.filter(function(s){return s.value>STRONG;})
+        .map(function(s){return "Strong "+s.label+" ("+s.value.toFixed(1)+")";});
+      if(!strengths.length) strengths.push("Maintains consistent baseline performance across categories");
+      var opps=[];
+      ["transparencyEthics","efficiency","upsellCompliance","customerInteraction","productKnowledge","teamCollab"]
+        .forEach(function(k){ var v=+scores[k]||0; if(v>0 && v<BELOW) opps.push(OPP[k]); });
+      if(!opps.length) opps.push("No critical coaching gaps — focus on sustaining current standards");
+      var risk = below.length>=2 ? "High" : below.length===1 ? "Medium" : "Low";
+      var action = {
+        High:"Schedule a structured 1:1 coaching session within 5 business days and arrange a shadow shift with a top performer.",
+        Medium:"Hold a brief, targeted check-in this week on the flagged category, then reassess at the next rating cycle.",
+        Low:"Recognise performance and assign a stretch goal or peer-mentoring responsibility."
+      }[risk];
+      var low = have.length ? have.reduce(function(a,b){return b.value<a.value?b:a;}) : {label:"the lowest category"};
+      var note = risk==="High"
+        ? name+" has clear, addressable gaps; with focused support on "+low.label+", performance can improve quickly within one cycle."
+        : risk==="Medium"
+        ? name+" is performing solidly overall; a short, specific conversation on "+low.label+" should close the remaining gap."
+        : name+" is a dependable, consistent performer; consider stretch responsibilities and a peer-mentoring role.";
+      return {strengths:strengths,opportunities:opps,risk:risk,managerAction:action,note:note};
+    }
+    function forTeam(list){
+      var counts={Low:0,Medium:0,High:0};
+      list.forEach(function(m){ counts[forScores(m.catAvg,m.name).risk]++; });
+      var tally={}; CATS.forEach(function(c){tally[c.label]=0;});
+      list.forEach(function(m){ CATS.forEach(function(c){
+        var v=+m.catAvg[c.key]||0; if(v>0&&v<BELOW) tally[c.label]++;
+      });});
+      var themes=Object.keys(tally).filter(function(k){return tally[k]>0;})
+        .sort(function(a,b){return tally[b]-tally[a];})
+        .map(function(k){return k+" ("+tally[k]+" associate"+(tally[k]>1?"s":"")+" below "+BELOW+")";});
+      var risk=counts.High>0?"High":counts.Medium>0?"Medium":"Low";
+      var strengths=[
+        counts.Low+" of "+list.length+" associates rated Low risk",
+        themes.length?"Strong performers available to support peer mentoring":"No category is systematically weak across the team"
+      ];
+      var opps=themes.length?themes.map(function(t){return "Team-wide focus area: "+t;})
+        :["No team-wide coaching gaps identified this cycle"];
+      var action={
+        High:"Prioritise the High-risk associates this week and run a short team huddle on the most common focus area.",
+        Medium:"Address the flagged associates individually and reinforce standards in the next team briefing.",
+        Low:"Sustain current standards; use top performers to mentor and raise the overall baseline."
+      }[risk];
+      var note=themes.length
+        ? "The team's main coaching theme is "+themes[0].split(" (")[0]+"; a focused group session plus targeted 1:1s will lift overall results."
+        : "The team is performing consistently; the priority is sustaining standards and developing depth through mentoring.";
+      return {strengths:strengths,opportunities:opps,risk:risk,managerAction:action,note:note,counts:counts};
+    }
+    function cardHTML(o,title,meta){
+      return '<div class="coach-card">'+
+        '<div class="coach-head"><div><h3>'+title+'</h3>'+
+          (meta?'<p class="coach-meta">'+meta+'</p>':'')+'</div>'+
+          '<span class="ai-tag">AI \u00b7 rules-based</span></div>'+
+        '<div class="coach-grid">'+
+          '<div class="coach-block"><h4>Strengths</h4><ul class="list list--good">'+
+            o.strengths.map(function(s){return "<li>"+s+"</li>";}).join("")+'</ul></div>'+
+          '<div class="coach-block"><h4>Coaching Opportunities</h4><ul class="list list--watch">'+
+            o.opportunities.map(function(x){return "<li>"+x+"</li>";}).join("")+'</ul></div>'+
+        '</div>'+
+        '<div class="coach-row">'+
+          '<div class="coach-risk"><span class="coach-risk-label">Risk Level</span>'+
+            '<span class="risk risk--'+o.risk.toLowerCase()+' risk--lg">'+o.risk+'</span></div>'+
+          '<div class="coach-action"><span class="coach-risk-label">Suggested Manager Action</span>'+
+            '<p>'+o.managerAction+'</p></div>'+
+        '</div>'+
+        '<blockquote class="coach-note"><span class="quote-mark">\u201c</span>'+o.note+'</blockquote>'+
+        '<p class="coach-foot">Generated locally by a rules-based engine for demonstration. '+
+        'A future release can route this through a secure backend for OpenAI / Azure OpenAI '+
+        'summaries — no API key is ever stored in the browser.</p></div>';
+    }
+    return {CATS:CATS,forScores:forScores,forTeam:forTeam,cardHTML:cardHTML};
+  })();
+
+  /* ===== Dashboard logic (your results.js + KPIs + team coaching) ===== */
+  const API = window.BACKEND_URL;
+  const byId = (id)=>document.getElementById(id);
+  let RAW=[];
+
+  const pad=(n)=>String(n).padStart(2,"0");
+  function ymdLocal(d){
+    d = (d instanceof Date)? d : new Date(d);
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  }
+  function inRangeLocalDate(ts, sYmd, eYmd){
+    const ymd = ymdLocal(ts);
+    return (!sYmd || ymd >= sYmd) && (!eYmd || ymd <= eYmd);
+  }
+  function startOfDay(d=new Date()){ const x=new Date(d); x.setHours(0,0,0,0); return x; }
+  function addDays(d,n){ const x=new Date(d); x.setDate(x.getDate()+n); return x; }
+  function daysAgo(n){ return startOfDay(addDays(new Date(), -n)); }
+  function setRangeToday(){ const t=ymdLocal(new Date()); byId("start").value=t; byId("end").value=t; }
+  function setRangeYesterday(){ const y=ymdLocal(addDays(new Date(),-1)); byId("start").value=y; byId("end").value=y; }
+  function setRangeLastN(n){ byId("start").value=ymdLocal(daysAgo(n-1)); byId("end").value=ymdLocal(new Date()); }
+  function chipClass(v){ v=Math.max(0,Math.min(10,Math.round(+v))); return "score-c"+v; }
+  function avg(a){ return a.length? a.reduce((x,y)=>x+y,0)/a.length : 0; }
+  function groupBy(arr,key){
+    const m=new Map();
+    arr.forEach(r=>{ const k=r[key]; if(!m.has(k)) m.set(k,[]); m.get(k).push(r); });
+    return m;
+  }
+  function scoreOrZero(x){ const n=+x; return Number.isFinite(n)? n : 0; }
+  function statusBadge(o){
+    const cls=o>=85?"status-exc":o>=70?"status-ok":"status-low";
+    const txt=o>=85?"Excellent":o>=70?"On Track":"Needs Coaching";
+    return `<span class="status ${cls}">${txt}</span>`;
+  }
+
+  async function load(){
+    try{
+      const res = await fetch(API, {cache:"no-store"});
+      const json = await res.json();
+      RAW = Array.isArray(json.data) ? json.data : [];
+      byId("updated").textContent = "Last updated " + new Date().toLocaleString();
+    }catch(e){ RAW=[]; byId("updated").textContent = "Backend unavailable"; }
+    renderAll();
+  }
+  document.addEventListener("DOMContentLoaded", ()=>{
+    if(!byId("start").value || !byId("end").value) setRangeToday();
+    load();
+  });
+  setInterval(load, 5*60*1000);
+
+  document.addEventListener("click",(e)=>{
+    const btn = e.target.closest("button[data-range]"); if(!btn) return;
+    const r = btn.dataset.range;
+    if(r==="today") setRangeToday();
+    else if(r==="yesterday") setRangeYesterday();
+    else setRangeLastN(+r);
+    renderAll();
+  });
+  ["start","end","search"].forEach(id=> byId(id).addEventListener("input", renderAll));
+
+  function aggregateByRSA(rows){
+    const g = groupBy(rows, "name");
+    const result = [];
+    g.forEach((listRows, name)=>{
+      if(!name) return;
+      listRows.sort((a,b)=> new Date(b.timestamp)-new Date(a.timestamp));
+      const last = listRows[0];
+      const overallAvg = avg(listRows.map(r=> scoreOrZero(r.overall)));
+      const keys = ["customerInteraction","upsellCompliance","productKnowledge","transparencyEthics","efficiency","teamCollab"];
+      const catAvg = Object.fromEntries(keys.map(k=>{
+        const vals = listRows
+          .map(r=> (r.scores && r.scores[k]!=null) ? +r.scores[k] : null)
+          .filter(v=> Number.isFinite(v));
+        return [k, vals.length? avg(vals) : 0];
+      }));
+      const totalChecks = listRows.reduce((acc,r)=> acc + ((r.checklist||[]).length||0), 0);
+      const checksOk   = listRows.reduce((acc,r)=> acc + ((r.checklist||[]).filter(Boolean).length||0), 0);
+      const checklistPct = totalChecks? (100*checksOk/totalChecks) : 0;
+      const customers = listRows.reduce((s,r)=> s + (+r.customersServed||1), 0);
+      result.push({name, overall:overallAvg, catAvg, checklistPct, customers, last:last.timestamp});
+    });
+    result.sort((a,b)=> b.overall - a.overall);
+    return result;
+  }
+
+  function renderTable(rows, tbodyId){
+    const tb = byId(tbodyId); tb.innerHTML="";
+    rows.forEach(row=>{
+      const c = row.catAvg;
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td><a href="detail.html?name=${encodeURIComponent(row.name)}">${row.name}</a></td>
+        <td><span class="score ${chipClass(row.overall/10)}">${row.overall.toFixed(0)}</span></td>
+        <td>${statusBadge(row.overall)}</td>
+        <td><span class="score ${chipClass(c.customerInteraction)}">${c.customerInteraction.toFixed(1)}</span></td>
+        <td><span class="score ${chipClass(c.upsellCompliance)}">${c.upsellCompliance.toFixed(1)}</span></td>
+        <td><span class="score ${chipClass(c.productKnowledge)}">${c.productKnowledge.toFixed(1)}</span></td>
+        <td><span class="score ${chipClass(c.transparencyEthics)}">${c.transparencyEthics.toFixed(1)}</span></td>
+        <td><span class="score ${chipClass(c.efficiency)}">${c.efficiency.toFixed(1)}</span></td>
+        <td><span class="score ${chipClass(c.teamCollab)}">${c.teamCollab.toFixed(1)}</span></td>
+        <td>${row.checklistPct.toFixed(0)}%</td>
+        <td>${row.customers}</td>
+        <td>${(row.last||"").slice(0,10)}</td>`;
+      tb.appendChild(tr);
+    });
+  }
+
+  function renderKpis(agg){
+    const n=agg.length;
+    const teamAvg = n? agg.reduce((s,r)=>s+r.overall,0)/n : 0;
+    const exc = agg.filter(r=> r.overall>=85).length;
+    const need = agg.filter(r=> CoachingEngine.forScores(r.catAvg,r.name).risk==="High").length;
+    const cards=[
+      {label:"Associates",value:n,sub:"rated, last 7 days"},
+      {label:"Team Average",value:n?teamAvg.toFixed(0):"—",sub:"weighted 0–100"},
+      {label:"Excellent",value:exc,sub:"overall ≥ 85"},
+      {label:"Needs Coaching",value:need,sub:"High AI risk"}
+    ];
+    byId("kpis").innerHTML = cards.map(c=>
+      `<div class="kpi"><div class="label">${c.label}</div>`+
+      `<div class="value">${c.value}</div><div class="sub">${c.sub}</div></div>`).join("");
+  }
+
+  function renderTeamCoach(agg){
+    const el=byId("teamCoach");
+    if(!agg.length){
+      el.innerHTML='<div class="card"><p class="note" style="margin:0">No ratings in the last 7 days — submit ratings from the Operations Portal to generate a team coaching summary.</p></div>';
+      return;
+    }
+    const c=CoachingEngine.forTeam(agg);
+    el.innerHTML=CoachingEngine.cardHTML(c,"Team Coaching Summary",
+      `Last 7 days · ${agg.length} associates · ${c.counts.High} High / ${c.counts.Medium} Medium / ${c.counts.Low} Low risk`);
+  }
+
+  function renderAll(){
+    const s = byId("start").value || ymdLocal(new Date());
+    const e = byId("end").value   || ymdLocal(new Date());
+    const q = (byId("search").value||"").toLowerCase();
+
+    const rangeRows = RAW.filter(r => r.name && inRangeLocalDate(r.timestamp, s, e));
+    const rangeAgg  = aggregateByRSA(rangeRows).filter(r=> r.name.toLowerCase().includes(q));
+    renderTable(rangeAgg, "tbody");
+    byId("empty").style.display = rangeAgg.length ? "none":"block";
+
+    const weeklyRows = RAW.filter(r=> new Date(r.timestamp) >= daysAgo(7));
+    const weeklyAgg  = aggregateByRSA(weeklyRows);
+    renderTable(weeklyAgg, "weeklyBody");
+    byId("weeklyNote").textContent = weeklyRows.length
+      ? `Overall average (all RSAs): ${avg(weeklyRows.map(r=> +r.overall||0)).toFixed(0)} / 100`
+      : "No data this week.";
+
+    const monthlyRows = RAW.filter(r=> new Date(r.timestamp) >= daysAgo(30));
+    const monthlyAgg  = aggregateByRSA(monthlyRows);
+    renderTable(monthlyAgg, "monthlyBody");
+    byId("monthlyNote").textContent = monthlyRows.length
+      ? `Overall average (all RSAs): ${avg(monthlyRows.map(r=> +r.overall||0)).toFixed(0)} / 100`
+      : "No data this month.";
+
+    /* AI layer — based on the weekly view */
+    renderKpis(weeklyAgg);
+    renderTeamCoach(weeklyAgg);
+  }
+  </script>
 </body>
 </html>

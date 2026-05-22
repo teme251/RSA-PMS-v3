@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RSA Performance Metrics System — Rate Associate</title>
+  <meta name="description" content="Personal prototype: rate a frontline associate. No confidential company data is used.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    window.BACKEND_URL = "https://script.google.com/macros/s/AKfycbxdegGrWMt0YlWMic9BURoZPczXgWb4Cx5IiXmEp9hJcUpKwVKpNhHU9khNxTKfRX_-Yw/exec";
+  </script>
+</head>
+<body>
+
+  <div class="disclaimer-strip">
+    Personal prototype for demonstration purposes. No confidential company data is used.
+  </div>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="brand">
+        <span class="logo" aria-hidden="true">
+          <svg viewBox="0 0 32 32" width="32" height="32">
+            <rect x="5" y="16" width="5" height="11" rx="1.5"></rect>
+            <rect x="13.5" y="10" width="5" height="17" rx="1.5"></rect>
+            <rect x="22" y="5" width="5" height="22" rx="1.5"></rect>
+          </svg>
+        </span>
+        <div class="brand-text">
+          <h1>RSA Performance Metrics System</h1>
+          <p class="subtitle">Rate Associate</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="ghost" onclick="history.back()">&larr; Back</button>
+        <button class="ghost" onclick="location.href='index.html'">Home</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="card">
+      <div id="who" class="topbar"></div>
+    </div>
+
+    <div class="card">
+      <h3 class="section-title">Policy &amp; Customer-First Checklist</h3>
+      <p class="note">Check only if completed properly.</p>
+      <div id="checklist" class="grid2"></div>
+    </div>
+
+    <div class="card">
+      <h3 class="section-title">Category Ratings (1&ndash;10)</h3>
+      <div id="ratings" class="grid2"></div>
+    </div>
+
+    <div class="card">
+      <h3 class="section-title">Customers &amp; Notes</h3>
+      <div class="row">
+        <label>Customers counted
+          <input id="cust" type="number" min="1" step="1" value="1" style="width:90px">
+        </label>
+      </div>
+      <div class="hr"></div>
+      <textarea id="notes" rows="4" placeholder="Coaching points, observations…" style="width:100%"></textarea>
+    </div>
+
+    <div class="row">
+      <button class="ghost" onclick="history.back()">Cancel</button>
+      <button class="primary" id="submitBtn">Submit Rating</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">Submitted</div>
+
+  <script>
+  /* ===== Rate logic (your rate.js — weights & scoring unchanged) ===== */
+  const RSA = JSON.parse(sessionStorage.getItem("current_rsa_v5") || "null");
+  if(!RSA){ alert("No RSA selected. Returning to home."); location.href="index.html"; }
+  const BACKEND_URL = window.BACKEND_URL;
+
+  /* Category weights — overall = weighted 0-100 */
+  const WEIGHTS = {
+    customerInteraction: 0.20,
+    upsellCompliance: 0.25,
+    productKnowledge: 0.15,
+    transparencyEthics: 0.20,
+    efficiency: 0.10,
+    teamCollab: 0.10,
+  };
+
+  const CHECKLIST_ITEMS = [
+    "Greeted customer within 10 seconds",
+    "Verified ID & payment clearly",
+    "Explained insurance options neutrally",
+    "Explained fuel/EV policy accurately",
+    "Offered upgrade only if beneficial",
+    "Reviewed total cost before payment",
+    "Closed courteously & asked for questions"
+  ];
+
+  const ratingDefs = [
+    ["customerInteraction","Customer Interaction"],
+    ["upsellCompliance","Upselling Compliance"],
+    ["productKnowledge","Product Knowledge"],
+    ["transparencyEthics","Transparency & Ethics"],
+    ["efficiency","Efficiency"],
+    ["teamCollab","Team Collaboration"]
+  ];
+
+  const byId = id => document.getElementById(id);
+  byId("who").innerHTML = `<h3 style="margin:0">${RSA.name}</h3><span class="badge">Rating</span>`;
+
+  /* checklist (unchecked) */
+  const chkEl = byId("checklist");
+  CHECKLIST_ITEMS.forEach((txt,i)=>{
+    const id = "c_"+i;
+    const wrap = document.createElement("label");
+    wrap.innerHTML = `<input type="checkbox" id="${id}"> <span>${txt}</span>`;
+    chkEl.appendChild(wrap);
+  });
+
+  function chipClass(v){
+    v = Math.max(0, Math.min(10, v|0));
+    return "label-c"+v;
+  }
+
+  /* chips 1–10 */
+  const ratingsEl = byId("ratings");
+  ratingDefs.forEach(([key,label])=>{
+    const section = document.createElement("div");
+    let chips = "";
+    for(let v=1; v<=10; v++){
+      chips += `
+        <input type="radio" name="${key}" id="${key}_${v}" value="${v}" ${v===7?'checked':''}>
+        <label for="${key}_${v}" class="${chipClass(v)}">${v}</label>`;
+    }
+    section.innerHTML = `
+      <div class="section-sub">${label}</div>
+      <div class="rate-chips">${chips}</div>`;
+    ratingsEl.appendChild(section);
+  });
+
+  function getScore(name){
+    const sel = document.querySelector(`input[name="${name}"]:checked`);
+    return sel ? +sel.value : 7;
+  }
+  function weightedScore(scores){
+    let sum=0; for(const [k,w] of Object.entries(WEIGHTS)) sum += (scores[k]/10)*w;
+    return +(sum*100).toFixed(1);
+  }
+
+  byId("submitBtn").addEventListener("click", async ()=>{
+    const scores = Object.fromEntries(ratingDefs.map(([k])=>[k, getScore(k)]));
+    const checklist = CHECKLIST_ITEMS.map((_,i)=> byId("c_"+i).checked);
+    const notes = (byId("notes").value||"").trim();
+    const customersServed = Math.max(1, +(byId("cust").value||1));
+    const overall = weightedScore(scores);
+
+    const payload = {
+      type: "submit_rating",
+      data: {
+        name: RSA.name,
+        timestamp: new Date().toISOString(),
+        scores, checklist, notes, customersServed, overall,
+        shift: ""
+      }
+    };
+
+    const t = byId("toast");
+    try{
+      const res = await fetch(BACKEND_URL, {
+        method: "POST",
+        headers: {"Content-Type":"text/plain;charset=utf-8"},
+        body: JSON.stringify(payload)
+      });
+      if(!res.ok) throw new Error("HTTP "+res.status);
+      t.textContent = "Submitted"; t.classList.add("show");
+      setTimeout(()=>{ t.classList.remove("show"); location.href="index.html"; }, 900);
+    }catch(e){
+      alert("Submit failed: "+e.message);
+    }
+  });
+  </script>
+</body>
+</html>
