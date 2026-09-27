@@ -1,6 +1,13 @@
-# Frontline performance reporting prototype
+# RSA Performance Metrics — Operational Reporting & Trend Analysis
 
-A personal browser prototype for reviewing service rating data by associate and date range. It shows team summaries, category averages, checklist completion, and an individual trend view. This repository is intended as a demonstration and contains no confidential company records.
+A browser-based reporting prototype connecting team-level performance summaries with associate-level analysis. Date-range filtering, category averages, checklist completion, and individual trend views support exploration of service-rating records. The repository is a demonstration and contains no confidential company records.
+
+
+## Engineering focus
+
+The application maps a defined JSON data contract into multiple analytical views: team tables, weekly and monthly summaries, and individual breakdowns. HTML, CSS, JavaScript, and Chart.js connect record retrieval with filtering, reporting, and time-oriented visualization. A compatible backend is required and is outside this repository.
+
+[Read the portfolio case study](https://teme251.github.io/teme251/project-rsa.html)
 
 ## What is in the repository
 
